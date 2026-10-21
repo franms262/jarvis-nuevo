@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#07111f">
+<link rel="manifest" href="/manifest.json">
+<title>J.A.R.V.I.S.</title>
+<style>
+:root{color-scheme:dark;--bg:#06101d;--panel:#0b1b2b;--cyan:#55dfff;--cyan2:#159ad2;--text:#e9f8ff;--muted:#91aabd;--line:#17364b}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#123b58 0,#07111f 50%,#030811 100%);font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--text);min-height:100vh}
+main{max-width:980px;margin:auto;padding:22px 16px 40px}.top{display:flex;align-items:center;justify-content:space-between;gap:12px}.brand{letter-spacing:.22em;font-size:13px;color:#a9eaff}.status{font-size:12px;color:#72e7c4;border:1px solid #1c625b;border-radius:20px;padding:7px 10px}
+.hero{text-align:center;padding:24px 0 18px}.orb{width:190px;height:190px;margin:0 auto 18px;position:relative;display:grid;place-items:center;border-radius:50%;background:radial-gradient(circle at 50% 45%,#164e70 0,#0b253d 42%,#06111f 68%);border:1px solid #2a9ec6;box-shadow:0 0 24px #0a9acb88,inset 0 0 24px #138ac566;transition:transform .2s,box-shadow .2s}
+.orb:before,.orb:after{content:"";position:absolute;inset:-12px;border-radius:50%;border:1px solid #38cfff88;animation:rotate 12s linear infinite}.orb:after{inset:-23px;border-style:dashed;opacity:.55;animation:rotate 24s linear infinite reverse}
+.jmark{font-size:94px;font-weight:200;color:#a7f1ff;text-shadow:0 0 12px #35cfff,0 0 34px #1499ff;line-height:1}
+.orb.listening{box-shadow:0 0 35px #27dfff,0 0 90px #078aff88,inset 0 0 35px #26dfff;animation:pulse .9s ease-in-out infinite alternate}
+.orb.speaking{box-shadow:0 0 48px #32dfff,0 0 100px #078affaa,inset 0 0 45px #26dfff;animation:pulse .55s ease-in-out infinite alternate}
+@keyframes pulse{from{transform:scale(.98)}to{transform:scale(1.045)}}@keyframes rotate{to{transform:rotate(360deg)}}
+h1{font-size:clamp(24px,5vw,36px);margin:0 0 8px;letter-spacing:.12em}.sub{color:var(--muted);font-size:14px}.wave{height:24px;display:flex;align-items:center;justify-content:center;gap:4px;margin:12px auto}.wave i{width:3px;height:5px;border-radius:5px;background:var(--cyan);opacity:.6}.speaking~.wave i{animation:wave .6s ease-in-out infinite alternate}.wave i:nth-child(2n){animation-delay:.12s}.wave i:nth-child(3n){animation-delay:.24s}@keyframes wave{to{height:22px;opacity:1}}
+.grid{display:grid;grid-template-columns:1.15fr .85fr;gap:14px}.panel{background:linear-gradient(145deg,#0d2031eF,#071522f2);border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:0 10px 35px #0003}.panel h2{font-size:14px;letter-spacing:.1em;margin:0 0 13px;color:#a9eaff}.chatlog{height:245px;overflow:auto;display:flex;flex-direction:column;gap:10px}.bubble{max-width:94%;padding:10px 12px;border-radius:12px;font-size:14px;line-height:1.45;white-space:pre-wrap}.bubble.assistant{align-self:flex-start;background:#102d42;border:1px solid #1a4b67}.bubble.user{align-self:flex-end;background:#123e58;border:1px solid #1b6d91}.composer{display:flex;gap:8px;margin-top:12px}.composer input{min-width:0;flex:1;background:#06111e;border:1px solid #24465b;border-radius:11px;padding:12px;color:white;font-size:14px}.btn{border:1px solid #267ea1;background:#10364c;color:#e9faff;border-radius:11px;padding:10px 13px;cursor:pointer;font-weight:600}.btn.primary{background:linear-gradient(120deg,#0b82ad,#1354a3);border-color:#34cfff}.btn:disabled{opacity:.5}.controls{display:flex;gap:8px;flex-wrap:wrap}.metric{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #173146;color:var(--muted);font-size:14px}.metric strong{color:#e9f8ff}.clockactions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.small{font-size:12px;color:var(--muted);line-height:1.5}.eventlist{max-height:150px;overflow:auto;font-size:12px;color:var(--muted);margin-top:10px}.footer{padding-top:14px;text-align:center;color:#668397;font-size:11px}
+@media(max-width:700px){main{padding:16px 12px 28px}.grid{grid-template-columns:1fr}.orb{width:150px;height:150px}.jmark{font-size:76px}.chatlog{height:210px}.top{align-items:flex-start}}
+</style>
+</head>
+<body><main>
+<header class="top"><div class="brand">J.A.R.V.I.S. <span style="color:#4dcfff">/ VOICE SYSTEM</span></div><div class="status" id="status">● LISTO</div></header>
+<section class="hero">
+<div class="orb" id="orb" aria-label="Logo animado de J.A.R.V.I.S."><div class="jmark">J</div></div>
+<h1>J.A.R.V.I.S.</h1><div class="sub" id="stateText">Tu asistente personal está preparado</div>
+<div class="wave" id="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+<div class="controls" style="justify-content:center"><button class="btn primary" id="micBtn">🎙️ Hablar con J.A.R.V.I.S.</button><button class="btn" id="stopBtn">■ Silenciar</button></div>
+</section>
+<div class="grid">
+<section class="panel"><h2>CONVERSACIÓN</h2><div class="chatlog" id="chatlog"><div class="bubble assistant">Hola. Soy J.A.R.V.I.S. Pulsa el micrófono para hablar conmigo o escribe tu pregunta.</div></div>
+<form class="composer" id="chatForm"><input id="message" placeholder="Escribe tu pregunta…" autocomplete="off"><button class="btn primary" type="submit">Enviar</button></form>
+<p class="small">La voz utiliza las funciones disponibles en tu navegador. En iPhone, abre la web en Safari y permite el micrófono.</p></section>
+<section class="panel"><h2>CONTROL HORARIO</h2>
+<div class="metric"><span>Marcas guardadas</span><strong id="eventCount">0</strong></div>
+<div class="metric"><span>Estado actual</span><strong id="clockState">Sin iniciar</strong></div>
+<div class="clockactions"><button class="btn primary" data-type="entrada">▶ Entrada</button><button class="btn" data-type="salida">■ Salida</button><button class="btn" data-type="inicio_pausa">Ⅱ Iniciar pausa</button><button class="btn" data-type="fin_pausa">▷ Fin de pausa</button></div>
+<div class="controls" style="margin-top:12px"><button class="btn" id="exportBtn">Exportar registros</button><button class="btn" id="importBtn">Importar copia JSON</button><input id="importFile" type="file" accept=".json,application/json" hidden></div>
+<div class="eventlist" id="eventList">Todavía no hay marcas nuevas.</div>
+<p class="small">Las marcas nuevas se guardan en el servidor. Para Render necesitas configurar almacenamiento persistente. La importación es aditiva y no sustituye las marcas actuales.</p>
+</section></div>
+<div class="footer">J.A.R.V.I.S. NUEVO · PROTOTIPO · No sustituye la versión antigua hasta validar datos y voz.</div>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const orb=$('orb'), stateText=$('stateText'), status=$('status'), log=$('chatlog');
+let recognition=null, isSpeaking=false;
+function setState(state,text){orb.classList.remove('listening','speaking');if(state)orb.classList.add(state);stateText.textContent=text;status.textContent=state==='listening'?'● ESCUCHANDO':state==='speaking'?'● HABLANDO':'● LISTO';}
+function speak(text){
+ if(!('speechSynthesis' in window)){setState('', 'Tu navegador no admite voz');return;}
+ window.speechSynthesis.cancel();isSpeaking=true;setState('speaking','J.A.R.V.I.S. está hablando…');
+ const utter=new SpeechSynthesisUtterance(text);utter.lang='es-ES';utter.rate=1;utter.pitch=.95;
+ const voices=window.speechSynthesis.getVoices();const spanish=voices.find(v=>v.lang.toLowerCase().startsWith('es'));if(spanish)utter.voice=spanish;
+ utter.onend=()=>{isSpeaking=false;setState('','Tu asistente está preparado');};utter.onerror=()=>{isSpeaking=false;setState('','No se pudo reproducir la voz');};
+ window.speechSynthesis.speak(utter);
+}
+function addBubble(text,who){const d=document.createElement('div');d.className='bubble '+who;d.textContent=text;log.appendChild(d);log.scrollTop=log.scrollHeight;return d;}
+async function ask(message){
+ addBubble(message,'user');$('message').value='';setState('','J.A.R.V.I.S. está pensando…');
+ try{const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message})});const data=await r.json();if(!r.ok)throw new Error(data.error||'Error de respuesta');addBubble(data.reply||'No he recibido respuesta.','assistant');speak(data.reply||'No he recibido respuesta.');}
+ catch(e){const msg='No he podido conectar con el servidor. Comprueba que J.A.R.V.I.S. esté iniciado y que la conexión funcione.';addBubble(msg,'assistant');speak(msg);setState('','Conexión no disponible');}
+}
+$('chatForm').addEventListener('submit',e=>{e.preventDefault();const m=$('message').value.trim();if(m)ask(m);});
+function startListening(){
+ const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(!SR){addBubble('Este navegador no ofrece reconocimiento de voz. Prueba Google Chrome en Windows o Safari en el iPhone.','assistant');return;}
+ if(recognition){try{recognition.stop()}catch{}}
+ window.speechSynthesis?.cancel();
+ recognition=new SR();recognition.lang='es-ES';recognition.interimResults=false;recognition.maxAlternatives=1;
+ recognition.onstart=()=>setState('listening','Te estoy escuchando…');
+ recognition.onresult=e=>{const text=e.results[0][0].transcript;setState('','He entendido: '+text);ask(text);};
+ recognition.onerror=e=>{setState('','No he podido escucharte: '+e.error);};
+ recognition.onend=()=>{if(!isSpeaking)setState('','Tu asistente está preparado');};
+ try{recognition.start()}catch(e){setState('','No se pudo iniciar el micrófono.');}
+}
+$('micBtn').addEventListener('click',startListening);
+$('stopBtn').addEventListener('click',()=>{if(recognition){try{recognition.stop()}catch{}}if(window.speechSynthesis)window.speechSynthesis.cancel();isSpeaking=false;setState('','Voz detenida');});
+async function refreshEvents(){
+ try{const r=await fetch('/api/time-events');const events=await r.json();$('eventCount').textContent=events.length;
+ const last=[...events].sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp))[0];
+ $('clockState').textContent=last?({entrada:'En jornada',salida:'Fuera de jornada',inicio_pausa:'En pausa',fin_pausa:'En jornada'}[last.type]||'Sin iniciar'):'Sin iniciar';
+ $('eventList').textContent=events.slice(-8).reverse().map(e=>`${new Date(e.timestamp).toLocaleString('es-ES')} · ${e.type.replace('_',' ')}`).join('\n')||'Todavía no hay marcas nuevas.';
+ }catch{$('clockState').textContent='Servidor no disponible';}
+}
+document.querySelectorAll('[data-type]').forEach(btn=>btn.addEventListener('click',async()=>{
+ try{const r=await fetch('/api/time-events',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:btn.dataset.type,timestamp:new Date().toISOString()})});const d=await r.json();if(!r.ok)throw new Error(d.error);await refreshEvents();speak(({entrada:'Entrada registrada.',salida:'Salida registrada.',inicio_pausa:'Pausa iniciada.',fin_pausa:'Pausa finalizada.'})[d.type]);}
+ catch{addBubble('No se pudo guardar la marca. Comprueba la conexión.','assistant');}
+}));
+$('exportBtn').addEventListener('click',()=>window.location.href='/api/export');
+$('importBtn').addEventListener('click',()=>$('importFile').click());
+$('importFile').addEventListener('change',async e=>{
+ const f=e.target.files[0];if(!f)return;
+ try{const data=JSON.parse(await f.text());const r=await fetch('/api/import',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});const result=await r.json();if(!r.ok)throw new Error(result.error);addBubble(`Importación completada: ${result.added} marcas nuevas añadidas. Total: ${result.total}.`,'assistant');await refreshEvents();}
+ catch(err){addBubble('No se pudo importar el archivo JSON. '+(err.message||''),'assistant');}
+ e.target.value='';
+});
+refreshEvents();
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('/sw.js').catch(()=>{});
+</script></body></html>
