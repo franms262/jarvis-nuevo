@@ -76,7 +76,12 @@ app.post('/api/chat', async (req, res) => {
       body: JSON.stringify({
         model,
         instructions: 'Eres J.A.R.V.I.S., un asistente en español. Responde de forma clara y breve. No afirmes que has registrado o consultado horas si no se te han proporcionado datos.',
-        input: message
+        input: `Pregunta del usuario: ${message}
+
+Registros horarios guardados:
+${JSON.stringify(readEvents(), null, 2)}
+
+Responde usando estos registros cuando la pregunta trate sobre horas trabajadas, entradas, salidas o pausas. Si los datos no permiten responder, dilo claramente. No inventes registros.`
       })
     });
     const data = await r.json();
